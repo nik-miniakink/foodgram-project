@@ -1,0 +1,30 @@
+{% load v1_filters %}
+<header class="header">
+      <nav class="nav">
+          {% if user.is_authenticated %}
+          <div class="nav__container container">
+
+                <ul class="nav__items list">
+                    <li class="nav__item"><a href="{% url 'index' %}" class="nav__link link">Рецепты</a></li>
+                    <li class="nav__item"><a href="{% url 'follow_index' %}" class="nav__link link">Мои подписки</a></li>
+                    <li class="nav__item"><a href="{% url 'recipe_new' %}" class="nav__link link">Создать рецепт</a></li>
+                    <li class="nav__item"><a href="{% url 'favorites' %}" class="nav__link link">Избранное</a></li>
+                    <li class="nav__item"><a href="{% url 'shopping-list' %}" class="nav__link link">Список покупок</a>
+                        <span class="badge badge_style_blue nav__badge" id="counter">{{ request|count_shoplist }}</span></li>
+
+                </ul>
+              <ul class="nav__items list">
+                  <li class="nav__item"><a href="{% url 'password_change' %}" class="nav__link link">Изменить пароль</a></li>
+                  <li class="nav__item"><a href="{% url 'logout' %}" class="nav__link link">Выход</a></li>
+          {% else %}
+          <div class="nav__container container">
+                    <ul class="nav__items list">
+                        <li class="nav__item "><a href="{% url 'index' %}" class="nav__link link">Рецепты</a></li>
+                        <li class="nav__item"><a href="{% url 'login' %}" class="nav__link link">Войти</a></li>
+                        <li class="nav__item"><a href="{% url 'signup' %}" class="nav__link link">Создать аккаунт</a></li>
+                    </ul>
+
+          </div>
+          {% endif %}
+      </nav>
+</header>

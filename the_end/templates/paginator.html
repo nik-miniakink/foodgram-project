@@ -1,0 +1,12 @@
+<nav class="pagination" aria-label="Search results pages">
+            <ul class="pagination__container">
+                <li class="pagination__item"><a class="pagination__link link" href=><span class="icon-left"></span></a></li>
+                {% for i in paginator.page_range %}
+                    {% if items.number == i %}
+                        <li class="page-item active"><span class="page-link">{{i}}<span class="sr-only"> (текущая) </span></span></li>
+                    {% else %}
+                        <li class="page-item"><a class="page-link" href="?page={{ i }}"> {{i}} </a></li>
+                    {% endif %}
+                {% endfor %}
+            </ul>
+</nav >

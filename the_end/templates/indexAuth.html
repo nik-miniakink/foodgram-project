@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+
+{% load static %}
+{% csrf_token %}
+{% block title %}  Последние рецепты {% endblock %}
+
+
+{% block static %}
+    <link rel="stylesheet" href="{% static '/pages/index.css' %}">
+{% endblock %}
+
+{% block content %}
+    {% include "item/RecipeItem.html" %}
+
+
+{% endblock %}
+
+{% block java-script %}
+{% csrf_token %}
+    <script src="{% static 'js/components/MainCards.js' %}"></script>
+
+    <script src="{% static 'js/components/Purchases.js' %}"></script>
+    <script src="{% static 'js/components/Favorites.js' %}"></script>
+
+    <script src="{% static 'js/config/config.js' %}"></script>
+    <script src="{% static 'js/components/CardList.js' %}"></script>
+    <script src="{% static 'js/components/Header.js' %}"></script>
+
+    <script src="{% static 'js/api/Api.js' %}"></script>
+    <script src="{% static 'js/pages/indexAuth.js' %}"></script>
+
+{% endblock %}

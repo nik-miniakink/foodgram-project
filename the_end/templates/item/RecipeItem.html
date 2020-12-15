@@ -1,0 +1,69 @@
+{% load v1_filters %}
+<main class="main container">
+    {% csrf_token %}
+        <div class="main__header">
+            <h1 class="main__title">Рецепты</h1>
+            <ul class="tags">
+                <ul class="tags">
+                {% for tag in tags %}
+                    <li class="tags__item">
+                    <a id="tags" class="tags__checkbox tags__checkbox_style_{{tag.style}} {% if tag.slug in tags_list %} tags__checkbox_active {% endif %}"
+                       href="?tag_list={{tag.slug}}">
+                    </a>
+                    <span class="tags__label">{{tag}}</span>
+                    </li>
+                {% endfor %}
+                </ul>
+            </ul>
+        </div>
+
+
+
+        <div class="card-list ">
+            {% for recipe in page %}
+                <div class="card"data-id="{{recipe.id}}" data-author="{{recipe.author.id}}>
+        {% load thumbnail %}
+            {% thumbnail recipe.image "364x240" crop="center" upscale=True as im %}
+                    <a href="{% url 'recipe_view' recipe.id %}" class="link" target="_blank"><img src="{{ im.url }}"
+                    alt="{{recipe.name}}" class="card__image"></a>
+            {% endthumbnail %}
+
+            <div class="card__body">
+                <a class="card__title link" href="{% url 'recipe_view' recipe.id %}" target="_blank">{{ recipe.name}}</a>
+
+
+                <ul class="card__items">
+                     {% for tag in recipe.tag.all %}
+
+                        <li class="card__item"><span class="badge badge_style_{{tag.style}}">{{tag.name}}</span></li>
+                     {% endfor %}
+                </ul>
+                <div class="card__items card__items_column">
+                    <p class="card__text"><span class="icon-time"></span> {{recipe.time}} минут</p>
+                    <p class="card__text"><span class="icon-user"></span> <a href="{% url 'author' recipe.author.id %}" style="color: black">{{recipe.author}}</a></p>
+
+                </div>
+            </div>
+            <div class="card__footer">
+                {% if user.is_authenticated %}
+                    {% if request|is_shoplist:recipe.id %}
+                        <button class="button button_style_light-blue-outline" name="purchases">
+                            <span class="icon-check button__icon"></span> Рецепт добавлен</button>
+                    {% else %}
+                        <button class="button button_style_light-blue" name="purchases" data-out>
+                            <span class="icon-plus button__icon"></span>Добавить в покупки</button>
+                    {% endif %}
+                    {% if request|is_favorite:recipe.id %}
+                        <button class="button button_style_none" name="favorites"><span class="icon-favorite icon-favorite_active"></span></button>
+                    {% else %}
+                        <button class="button button_style_none" name="favorites" data-out><span class="icon-favorite"></span></button>
+                    {% endif %}
+                {% endif %}
+            </div>
+
+
+
+        </div>
+            {% endfor %}
+    </div>
+</main>
