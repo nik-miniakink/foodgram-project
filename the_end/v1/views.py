@@ -160,14 +160,12 @@ def favorite(request):
 def add_favorite(request):
     """
     Добавляет рецепт в избранное
-
     """
     if request.method == "POST":
         recipe_id = int(json.loads(request.body).get('id'))
         recipe = get_object_or_404(Recipes, id=recipe_id)
-        created = Favorite.objects.get_or_create(
+        obj, created = Favorite.objects.get_or_create(
             fuser=request.user, recipe=recipe)
-        print(created)
         if not created:
             return JsonResponse({'success': False})
 

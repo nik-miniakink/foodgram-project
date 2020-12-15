@@ -32,10 +32,8 @@ def get_filter_value(request, recipe_id):
     """
     is_favorites = Favorite.objects.filter(
         fuser=request.user,
-        recipe_id=recipe_id).all()
-    if is_favorites:
-        return True
-    return False
+        recipe_id=recipe_id).exists()
+    return is_favorites
 
 
 @register.filter(name='is_follow')
@@ -67,7 +65,5 @@ def get_filter_values(request, recipe_id):
     """
     is_slist = ShoppingList.objects.filter(
         user=request.user,
-        recipe_id=recipe_id).all()
-    if is_slist:
-        return True
-    return False    
+        recipe_id=recipe_id).exists()
+    return is_slist

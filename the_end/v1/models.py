@@ -56,7 +56,6 @@ class IngredientIncomposition(models.Model):
     """
     Информация о ингредиентах, входящих в рецепт
     """
-    # recipe = models.ForeignKey(Recipes, on_delete=models.CASCADE, blank=True, null=False)
     ingredient = models.ForeignKey(Ingredient,on_delete=models.DO_NOTHING)
     quantity = models.SmallIntegerField(verbose_name='Количество')
 
