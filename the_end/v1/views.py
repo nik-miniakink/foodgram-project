@@ -12,13 +12,10 @@ from .models import User, Tag, Recipes, IngredientIncomposition, \
 
 tags_list = {}
 
-
-def index(request):
+def update_tags_list(request):
     """
-    Отрисовывает главную страницу и показывает по 6 постов на странице
-    При наличии выбраных тэгов производит фильтрафию рецептов по тэгу
+    Добавляет тэг в словарь тэгов, или удаляет если он уже имеется
     """
-
     tag = request.GET.get("tag_list")
     if tag is not None:
         if tag not in tags_list:
@@ -26,10 +23,17 @@ def index(request):
         else:
             del tags_list[tag]
 
-    if len(tags_list) > 0:
-        recipe_list = Recipes.objects.filter(tag__slug__in=tags_list).order_by("-pub_date").all()
-    else:
-        recipe_list = Recipes.objects.order_by("-pub_date").all()
+
+def index(request):
+    """
+    Отрисовывает главную страницу и показывает по 6 постов на странице
+    При наличии выбраных тэгов производит фильтрафию рецептов по тэгу
+    """
+    update_tags_list(request)
+
+    recipe_list = Recipes.objects.distinct().order_by("-pub_date").all()
+    if len(tags_list) != 0:
+        recipe_list = recipe_list.filter(tag__slug__in=tags_list).all()
 
     paginator = Paginator(recipe_list, 6)
     page_number = request.GET.get('page')
@@ -53,12 +57,12 @@ def recipe_view(request, recipe_id):
     :return:
     """
     recipe = get_object_or_404(Recipes, id=recipe_id)
-    tags = Tag.objects.filter(recipes=recipe)
+    recipe_tags = Tag.objects.filter(recipes=recipe)
     ings = IngredientIncomposition.objects.filter(recipes=recipe)
 
     return render(request, 'singlePage.html', {
         'recipe': recipe,
-        'tags': tags,
+        'recipe_tags': recipe_tags,
         'ings': ings,
     })
 
@@ -68,18 +72,13 @@ def author_list(request, user_id):
     Отрисовывает страницу выбранного автора по id автора
     При наличии выделения тэгов происходит фильтрация
     """
-    tag = request.GET.get("tag_list")
-    if tag is not None:
-        if tag not in tags_list:
-            tags_list[tag] = tag
-        else:
-            del tags_list[tag]
+    update_tags_list(request)
+
     user = get_object_or_404(User, id=user_id)
 
-    if len(tags_list) > 0:
-        recipe_list = Recipes.objects.filter(tags__slug__in=tags_list, author=user).order_by("-pub_date").all()
-    else:
-        recipe_list = Recipes.objects.filter(author=user).order_by("-pub_date").all()
+    recipe_list = Recipes.objects.filter(author=user).order_by("-pub_date").all()
+    if len(tags_list) != 0:
+        recipe_list = recipe_list.filter(tag__slug__in=tags_list).all()
 
     paginator = Paginator(recipe_list, 6)
     page_number = request.GET.get('page')
@@ -87,12 +86,11 @@ def author_list(request, user_id):
 
     tags = Tag.objects.all()
 
-    return render(request, 'indexAuth.html', {
+    return render(request, 'authorRecipe.html', {
         'page': page,
         'paginator': paginator,
         'recipes': recipe_list,
         'page_number': page_number,
-        'tags': tags,
         'tags_list': tags_list,
     })
 
@@ -127,18 +125,11 @@ def favorite(request):
     :param request:
     :return:
     """
-    tag = request.GET.get("tag_list")
-    if tag is not None:
-        if tag not in tags_list:
-            tags_list[tag] = tag
-        else:
-            del tags_list[tag]
+    update_tags_list(request)
 
-    if len(tags_list) > 0:
-        recipe_list = Recipes.objects.filter(tag__slug__in=tags_list,
-                                             favorite_recipe__fuser__id=request.user.id).order_by("-pub_date").all()
-    else:
-        recipe_list = Recipes.objects.filter(favorite_recipe__fuser__id=request.user.id).order_by("-pub_date").all()
+    recipe_list = Recipes.objects.filter(favorite_recipe__fuser__id=request.user.id).order_by("-pub_date").all()
+    if len(tags_list) != 0 :
+        recipe_list=recipe_list.filter(tag__slug__in=tags_list).all()
 
     tags = Tag.objects.all()
 
@@ -150,7 +141,6 @@ def favorite(request):
         'paginator': paginator,
         'recipes': recipe_list,
         'page_number': page_number,
-        'tags': tags,
         'tags_list': tags_list,
     }
     return render(request, 'favorite.html', context)
@@ -287,8 +277,8 @@ def user_recipe_new(request):
             recipe = form.save(commit=False)
             recipe.author = user
             recipe.save()
-            print(request.POST)
-            recipe_tags_list = request.POST.getlist('tag')
+            recipe_tags_list = request.POST.getlist('tags')
+
             for tag_id in recipe_tags_list:
                 tag = Tag.objects.get(id=tag_id)
                 recipe.tag.add(tag)

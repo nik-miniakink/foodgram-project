@@ -1,11 +1,13 @@
+
 from django import template
+from django.conf import settings
+
 
 from ..models import Favorite, ShoppingList, Follow
 from ..models import Recipes
 
 
 register = template.Library()
-recipe_on_page = 3
 
 
 @register.filter(name='items_follow')
@@ -13,7 +15,7 @@ def get_filter_values(request, author_id):
     """
     Возвращает N первых рецепта по id автора
     """
-    return Recipes.objects.filter(author=author_id).order_by("pub_date")[:recipe_on_page]
+    return Recipes.objects.filter(author=author_id).order_by("pub_date")[:settings.RECIPE_ON_PAGE]
 
 
 @register.filter(name='count_recipises')
@@ -22,7 +24,7 @@ def get_filter_values(request, author_id):
     Возращает количество рецептов без показанных на странице
     """
     count = Recipes.objects.filter(author=author_id).count()
-    return (count - recipe_on_page)
+    return (count - settings.RECIPE_ON_PAGE)
 
 
 @register.filter(name='is_favorite')
@@ -38,6 +40,9 @@ def get_filter_value(request, recipe_id):
 
 @register.filter(name='is_follow')
 def get_filter_value(request, author_id):
+    """
+    Проверяет добавлен
+    """
     is_follow = Follow.objects.filter(
         user=request.user,
         author_id=author_id
