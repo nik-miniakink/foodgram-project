@@ -173,7 +173,6 @@ def delete_favorite(request, recipe_id):
         user = request.user
         deleted = Favorite.objects.filter(
             fuser_id=user.id, recipe_id=recipe_id).delete()
-        print(deleted)
         return JsonResponse({'success': True}) if deleted else JsonResponse({'success': False})
     else:
         return JsonResponse({'success': False})

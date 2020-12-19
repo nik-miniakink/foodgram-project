@@ -45,11 +45,8 @@ def get_filter_value(request, author_id):
     """
     is_follow = Follow.objects.filter(
         user=request.user,
-        author_id=author_id
-    )
-    if is_follow:
-        return True
-    return False
+        author_id=author_id).exists()
+    return is_follow
 
 
 @register.filter(name='count_shoplist')
