@@ -41,7 +41,7 @@ def index(request):
 
     tags = Tag.objects.all()
 
-    return render(request, 'indexAuth.html', {
+    return render(request, 'index.html', {
         'page': page,
         'paginator': paginator,
         'recipes': recipe_list,
