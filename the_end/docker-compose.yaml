@@ -1,0 +1,34 @@
+version: '3.3'
+
+volumes:
+  postgres_data:
+  static_valume:
+  media_valume:
+
+services:
+  db:
+    image: postgres:latest
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+    env_file:
+      - ./the_end/.env
+  web:
+    image: nikminiakink/foogram:v1
+    restart: always
+    command: gunicorn the_end.wsgi:application --bind 0.0.0.0:8000
+    volumes:
+      - static_valume:/code/staticfiles
+      - media_valume:/code/media
+    depends_on:
+      - db
+    env_file:
+      - ./the_end/.env
+  nginx:
+    build: ./nginx
+    volumes:
+      - static_valume:/var/staticfiles
+      - media_valume:/var/media
+    ports:
+      - "80:80"
+    depends_on:
+      - web
