@@ -25,9 +25,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'o2ds4j_%0rb3p3nasi^k63mt%5o=6*3(=858!s9u8jvrn)xlf9'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
-ALLOWED_HOSTS = ['84.201.141.1', '127.0.0.1', 'kolxozlenina.gq', 'www.kolxozlenina.gq']
+ALLOWED_HOSTS = ['*', 'localhost']
 
 
 # Application definition
@@ -87,21 +87,16 @@ WSGI_APPLICATION = 'the_end.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql',
+        'ENGINE': os.environ.get('DB_ENGINE'),
         'NAME': os.environ.get('DB_NAME'),
         'USER': os.environ.get('POSTGRES_USER'),
         'PASSWORD': os.environ.get('POSTGRES_PASSWORD'),
         'HOST': os.environ.get('DB_HOST'),
         'PORT': os.environ.get('DB_PORT'),
-
-        # 'NAME': 'postgres',
-        # 'USER': 'postgres',
-        # 'PASSWORD': 'db_connect',
-        # 'HOST': 'db',
-        # 'PORT': '5432',
-
     }
 }
+
+
 
 RECIPE_ON_PAGE = 3
 
