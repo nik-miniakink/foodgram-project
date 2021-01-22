@@ -17,8 +17,8 @@ services:
     restart: always
     command: gunicorn the_end.wsgi:application --bind 0.0.0.0:8000
     volumes:
-      - static_valume:/code/staticfiles
-      - media_valume:/code/media
+      - static_valume:/code/foodgram-project/the-end/staticfiles
+      - media_valume:/code/foodgram-project/the-end/media
     depends_on:
       - db
     env_file:
