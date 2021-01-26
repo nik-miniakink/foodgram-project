@@ -320,14 +320,16 @@ def user_recipe_edit(request, recipe_id):
             form.add_error(None, 'Добавьте ингредиенты')
         if form.is_valid():
             form.save()
-            IngredientIncomposition.objects.filter(recipes=recipe).delete()
+            recipe.ingredient_in.clear()
 
             for ing_name, quantity in ingredients.items():
-                ingredient = get_object_or_404(Ingredient, name=ing_name)
-                IngredientIncomposition.objects.create(
-                    ingredient=ingredient,
-                    quantity=quantity)
 
+                ingredient = Ingredient.objects.get_or_create(
+                    name=ing_name, units_of_measurement='шт')[0]
+                new_ingredient = IngredientIncomposition.objects.get_or_create(
+                    ingredient=ingredient,
+                    quantity=quantity)[0]
+                recipe.ingredient_in.add(new_ingredient)
             return redirect('recipe_view', recipe_id=recipe.id)
     else:
         form = RecipeForm()
@@ -344,6 +346,42 @@ def user_recipe_edit(request, recipe_id):
         'tags_list': tags_list
     })
 
+
+# def change_recipe(request, recipe_id):
+#     recipe = get_object_or_404(Recipe, id=recipe_id)
+#     user = request.user
+#     author = recipe.author
+#     if user != author:
+#         return redirect('recipe_view', recipe_id=recipe_id)
+#     form = RecipeForm(
+#         request.POST or None,
+#         files=request.FILES or None,
+#         instance=recipe
+#     )
+#     ingredients = get_form_ingredients(request)
+#     if form.is_valid():
+#         form.save()
+#         recipe.ingredients.clear()
+#         for title, amount in ingredients.items():
+#             ingredient = Ingredient.objects.get_or_create(
+#                 title=title, dimension='шт.')[0]
+#             new_ingredient = IngredientIncomposition.objects.get_or_create(
+#                 ingredient=ingredient,
+#                 amount=amount)[0]
+#             recipe.ingredient_in.add(new_ingredient)
+#
+#         return redirect('recipe_view', recipe_id=recipe_id)
+#
+#     if request.method == 'POST' and not ingredients:
+#         form.add_error(None, 'Обязательное поле.')
+#     recipe_tags = recipe.tags.all()
+#     ingredients = recipe.ingredients.all()
+#     return render(request, 'formChangeRecipe.html', {
+#         'form': form,
+#         'recipe': recipe,
+#         'ingredients': ingredients,
+#         'recipe_tags': recipe_tags
+#     })
 
 @login_required
 def shopping_list(request):

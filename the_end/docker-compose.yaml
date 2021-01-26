@@ -13,12 +13,12 @@ services:
     env_file:
       - ./the_end/.env
   web:
-    image: nikminiakink/foodgram:v2
+    image: nikminiakink/foodgram:v15
     restart: always
     command: gunicorn the_end.wsgi:application --bind 0.0.0.0:8000
     volumes:
-      - static_valume:/staticfiles
-      - media_valume:/media
+      - static_valume:/code/staticfiles
+      - media_valume:/code/media
     depends_on:
       - db
     env_file:
