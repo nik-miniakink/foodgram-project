@@ -32,6 +32,6 @@ urlpatterns = [
          views.delete_purchases, name="delete_purchases"),
 
     path('shopping-list/', views.shopping_list, name='shopping-list'),
-
+    path("shop_list/get_pdf/", views.send_pdf, name="shop_list_send_pdf"),
     path("", views.index, name="index"),
 ]

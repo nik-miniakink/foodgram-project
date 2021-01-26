@@ -1,11 +1,16 @@
+import datetime as dt
 import json
+import io
 
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
 from django.shortcuts import get_object_or_404, redirect, render
-from django.http import JsonResponse
+from django.http import JsonResponse, FileResponse
+
 
 from .form import RecipeForm
+from .handlers import generate_pdf, get_recipe_ingredients
+
 from .models import User, Tag, Recipes, IngredientIncomposition, \
     Ingredient, Follow, Favorite, ShoppingList
 
@@ -346,43 +351,6 @@ def user_recipe_edit(request, recipe_id):
         'tags_list': tags_list
     })
 
-
-# def change_recipe(request, recipe_id):
-#     recipe = get_object_or_404(Recipe, id=recipe_id)
-#     user = request.user
-#     author = recipe.author
-#     if user != author:
-#         return redirect('recipe_view', recipe_id=recipe_id)
-#     form = RecipeForm(
-#         request.POST or None,
-#         files=request.FILES or None,
-#         instance=recipe
-#     )
-#     ingredients = get_form_ingredients(request)
-#     if form.is_valid():
-#         form.save()
-#         recipe.ingredients.clear()
-#         for title, amount in ingredients.items():
-#             ingredient = Ingredient.objects.get_or_create(
-#                 title=title, dimension='шт.')[0]
-#             new_ingredient = IngredientIncomposition.objects.get_or_create(
-#                 ingredient=ingredient,
-#                 amount=amount)[0]
-#             recipe.ingredient_in.add(new_ingredient)
-#
-#         return redirect('recipe_view', recipe_id=recipe_id)
-#
-#     if request.method == 'POST' and not ingredients:
-#         form.add_error(None, 'Обязательное поле.')
-#     recipe_tags = recipe.tags.all()
-#     ingredients = recipe.ingredients.all()
-#     return render(request, 'formChangeRecipe.html', {
-#         'form': form,
-#         'recipe': recipe,
-#         'ingredients': ingredients,
-#         'recipe_tags': recipe_tags
-#     })
-
 @login_required
 def shopping_list(request):
     """
@@ -396,3 +364,23 @@ def shopping_list(request):
         'shopping-list.html',
         {'shopping_list': shopping_list}
     )
+
+@login_required
+def send_pdf(request):
+    my_shop_list = ShoppingList.objects.filter(user=request.user).all()
+    ingredients = get_recipe_ingredients(my_shop_list)
+    buffer = io.BytesIO()
+    generate_pdf(ingredients, buffer)
+    buffer.seek(0)
+    date_str = dt.datetime.now().strftime('%d-%m-%Y_%H-%M')
+
+
+
+
+    # if recipes:
+    #     my_history = History.objects.create(user=request.user)
+    #     for recipe in recipes:
+    #         my_history.recipes.add(recipe)
+    #     my_shop_list.recipes.clear()
+    return FileResponse(buffer, as_attachment=True,
+                        filename=f'shoplist_{date_str}')
