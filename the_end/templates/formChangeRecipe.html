@@ -48,7 +48,6 @@
                 </div>
             </div>
             <div class="form__group">
-                {% csrf_token %}
                 <label for="nameIngredient" class="form__label">Ингредиенты</label>
                 <div class="form__field-group">
                     <div class="form__field-group-ingredientes">
@@ -60,20 +59,22 @@
                         <label for="cantidad" class="form__label" id="cantidadVal">шт.</label>
                     </div>
                     <div class="form__field-group-ingredientes-container">
-                        {% for ing in recipe.ingredient_in.all %}
-                            <div class="form__field-item-ingredient"
-                                 id="{{ ing.id }}">
-                                <span> {{ ing.ingredient.name }} {{ ing.quantity }} {{ ing.ingredient.units_of_measurement }}</span>
-                                <span class="form__field-item-delete"></span>
-                                <input id="nameIngredient_{{ing.id}}"
-                                       name="nameIngredient_{{ ing.id }}"
-                                       type="hidden"
-                                       value="{{ ing.ingredient.name }}">
+                        {% for ing in ingredients %}
+                            <div class="form__field-item-ingredient" id="{{ ing.pk }}">
+                                <span>{{ ing.ingredient.name }} {{ ing.quantity }}{{ ing.ingredient.nits_of_measurement }}</span>
+                                <span class="form__field-item-delete" ></span>
+                                <input id="nameIngredient_{{ ing.id }}" name="nameIngredient_{{ ing }}" type="hidden" value="{{ ing.ingredient.name }}">
+                                <input id="valueIngredient_{{ ing.id }}" name="valueIngredient_{{ ing }}" type="hidden" value="{{ ing.quantity }}">
+                                <input id="unitsIngredient_{{ ing.id }}" name="unitsIngredient_{{ ing }}" type="hidden" value="{{ ing.ingredient.nits_of_measurement }}">
                             </div>
                         {% endfor %}
                     </div>
                     <span class="form__ingredient-link" id="addIng">Добавить ингредиент</span>
-                    <span class="form__error"></span>
+                    {% for error in form.errors %}
+                    <span class="form__error">
+                        {{ error }}
+                    </span>
+                    {% endfor %}
                 </div>
             </div>
             <div class="form__group">
