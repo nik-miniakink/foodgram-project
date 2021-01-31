@@ -9,11 +9,12 @@ def get_recipe_ingredients(shoplist):
         for ing in qwer.recipe.ingredient_in.all():
             name = ing.ingredient.name
             description = ing.ingredient.description
+            units = ing.ingredient.units_of_measurement
             quantity = ing.quantity
             if name in final_dict and description == final_dict[name][1]:
                 final_dict[name][0] += quantity
             else:
-                final_dict[name] = [quantity, description]
+                final_dict[name] = [quantity, units, description]
     return final_dict
 
 

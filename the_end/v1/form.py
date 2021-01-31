@@ -9,7 +9,7 @@ class RecipeForm(ModelForm):
         fields = ('name', "time", "description", "image",)
 
 
-class ING(ModelForm):
-    class Meta:
-        model = IngredientIncomposition
-        fields = ('ingredient','quantity')
+# class ING(ModelForm):
+#     class Meta:
+#         model = IngredientIncomposition
+#         fields = ('ingredient','quantity')

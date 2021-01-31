@@ -226,6 +226,9 @@ def add_purchases(request):
 
 @login_required
 def delete_purchases(request, recipe_id):
+    """
+    Удаляет рецепт и покупок
+    """
     if request.method == "DELETE":
         deleted = ShoppingList.objects.filter(
             user_id=request.user.id, recipe_id=recipe_id).delete()
@@ -233,19 +236,20 @@ def delete_purchases(request, recipe_id):
     else:
         return JsonResponse({'success': True})
 
+
 @login_required
 def get_ingredients(request):
     """
-    Вытягивает ингредиенты из формы
+    вынимает данные из формы
     """
     ingredients = {}
     for key, ingredient_name in request.POST.items():
         if 'nameIngredient' in key:
-            _ = key.split('_')
-            ingredients[ingredient_name] = int(request.POST[
-                f'valueIngredient_{_[1]}']
-            )
+            ing_id = key.split('_')[-1]
+            ingredients[ingredient_name] = int(ing_id)
     return ingredients
+
+
 
 @login_required
 def get_ingredients_js(request):
@@ -288,10 +292,12 @@ def user_recipe_new(request):
                 recipe.tag.add(tag)
 
             for ing_name, quantity in ingredients.items():
-                ingredient = get_object_or_404(Ingredient, name=ing_name)
-                IngredientIncomposition.objects.create(
+                ingredient = Ingredient.objects.get(
+                    name=ing_name)
+                new_ingredient = IngredientIncomposition.objects.get_or_create(
                     ingredient=ingredient,
-                    quantity=quantity)
+                    quantity=quantity)[0]
+                recipe.ingredient_in.add(new_ingredient)
             form.save_m2m()
             return redirect('index')
     else:
@@ -321,16 +327,12 @@ def user_recipe_edit(request, recipe_id):
     )
     if request.method == "POST":
         ingredients = get_ingredients(request)
-        if not ingredients:
-            form.add_error(None, 'Добавьте ингредиенты')
         if form.is_valid():
             form.save()
             recipe.ingredient_in.clear()
 
             for ing_name, quantity in ingredients.items():
-
-                ingredient = Ingredient.objects.get_or_create(
-                    name=ing_name, units_of_measurement='шт')[0]
+                ingredient = Ingredient.objects.get(name=ing_name)
                 new_ingredient = IngredientIncomposition.objects.get_or_create(
                     ingredient=ingredient,
                     quantity=quantity)[0]
@@ -355,8 +357,6 @@ def user_recipe_edit(request, recipe_id):
 def shopping_list(request):
     """
     Отрисовывает страницу покупок
-    :param request:
-    :return:
     """
     shopping_list = ShoppingList.objects.filter(user=request.user).all()
     return render(
@@ -367,20 +367,16 @@ def shopping_list(request):
 
 @login_required
 def send_pdf(request):
+    """
+    Создает pdf файл со списком ингредиентов
+    :param request:
+    :return:
+    """
     my_shop_list = ShoppingList.objects.filter(user=request.user).all()
     ingredients = get_recipe_ingredients(my_shop_list)
     buffer = io.BytesIO()
     generate_pdf(ingredients, buffer)
     buffer.seek(0)
     date_str = dt.datetime.now().strftime('%d-%m-%Y_%H-%M')
-
-
-
-
-    # if recipes:
-    #     my_history = History.objects.create(user=request.user)
-    #     for recipe in recipes:
-    #         my_history.recipes.add(recipe)
-    #     my_shop_list.recipes.clear()
     return FileResponse(buffer, as_attachment=True,
                         filename=f'shoplist_{date_str}')

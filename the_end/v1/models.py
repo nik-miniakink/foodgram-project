@@ -64,6 +64,9 @@ class IngredientIncomposition(models.Model):
 
 
 class Follow(models.Model):
+    """
+    Информация о подписках
+    """
     user = models.ForeignKey(User, on_delete=models.CASCADE,
                              related_name="follower", verbose_name="Подписчик")
     author = models.ForeignKey(User, on_delete=models.CASCADE,
@@ -71,6 +74,9 @@ class Follow(models.Model):
 
 
 class Favorite(models.Model):
+    """
+    Информация об избранном
+    """
     fuser = models.ForeignKey(
         User, on_delete=models.CASCADE, related_name="favorites_user", verbose_name="Пользователь")
     recipe = models.ForeignKey(
@@ -78,6 +84,9 @@ class Favorite(models.Model):
 
 
 class ShoppingList(models.Model):
+    """
+    Информация о списке покупок
+    """
     user = models.ForeignKey(
         User, on_delete=models.CASCADE, related_name="shoplist_user", verbose_name="Пользователь")
     recipe = models.ForeignKey(
