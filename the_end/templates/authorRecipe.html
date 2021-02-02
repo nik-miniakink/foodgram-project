@@ -7,7 +7,7 @@
 
 
 {% block static %}
-    <link rel="stylesheet" href="./pages/index.css">
+    <link rel="stylesheet" href="{% static '/pages/index.css' %}">
 {% endblock %}
 
 
@@ -15,9 +15,9 @@
     {% include "item/RecipeItem.html" %}
 {% endblock %}
 
-
-{% include "paginator.html"%}
-
+{% block paginator %}
+    {% include 'paginator.html'%}
+{% endblock %}
 
 {% block java-script %}
     <script src="{% static 'js/components/MainCards.js' %}"></script>

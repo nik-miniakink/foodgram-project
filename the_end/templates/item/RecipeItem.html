@@ -22,11 +22,11 @@
         <div class="card-list ">
             {% for recipe in page %}
                 <div class="card"data-id="{{recipe.id}}" data-author="{{recipe.author.id}}>
-        {% load thumbnail %}
-            {% thumbnail recipe.image "364x240" crop="center" upscale=True as im %}
-                    <a href="{% url 'recipe_view' recipe.id %}" class="link" target="_blank"><img src="{{ im.url }}"
-                    alt="{{recipe.name}}" class="card__image"></a>
-            {% endthumbnail %}
+                    {% load thumbnail %}
+                    {% thumbnail recipe.image "500x500" crop="center" upscale=True as im %}
+                        <a href="{% url 'recipe_view' recipe.id %}" class="link" target="_blank"><img src="{{ im.url }}"
+                        alt="{{recipe.name}}" class="card__image"></a>
+                {% endthumbnail %}
 
             <div class="card__body">
                 <a class="card__title link" href="{% url 'recipe_view' recipe.id %}" target="_blank">{{ recipe.name}}</a>

@@ -12,7 +12,7 @@
 {% load v1_filters %}
 <main class="main container">
         <div class="single-card" data-id="{{recipe.id}}" data-author="{{recipe.author.id}}">
-            {% load thumbnail %}
+                {% load thumbnail %}
                 {% thumbnail recipe.image "500x500" crop="center" upscale=True as im %}
                     <a href="{% url 'recipe_view' recipe.id %}" class="link" target="_blank"><img src="{{ im.url }}"
                     alt="{{recipe.name}}" class="card__image"></a>
@@ -55,7 +55,15 @@
                             <span class="icon-plus button__icon"></span>Добавить в покупки</button>
                     {% endif %}
                     </li>
-                    <li class="single-card__item"><button class="button button_style_light-blue button_size_subscribe" name="subscribe" data-out>Подписаться на автора</button></li>
+                    {% if request.user != recipe.author %}
+                        {% if request|is_follow:recipe.author.id %}
+                            <li class="single-card__item"><button class="button button_style_light-blue button_size_subscribe"
+                                                                  name="subscribe" data-out>Отписаться от автора</button></li>
+                        {% else %}
+                            <li class="single-card__item"><button class="button button_style_light-blue-outline button_size_subscribe"
+                                                                  name="subscribe" data-out>Подписаться на автора</button></li>
+                        {% endif %}
+                    {% endif %}
                 </ul>
                 {% endif %}
                 <div class="single-card__section">
@@ -74,9 +82,9 @@
         </div>
     </main>
 
-    {% include "paginator.html"%}
 
 {% endblock %}
+
 
 {% block java-script %}
 {% csrf_token %}

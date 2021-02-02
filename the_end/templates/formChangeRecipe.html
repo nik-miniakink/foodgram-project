@@ -23,7 +23,10 @@
                 <div class="form__field-group">
                     <input type="text" id="id_name" name="name" class="form__input"
                     value="{{recipe.name}}">
-                    <span class="form__error"></span>
+                    {% if form.errors %}
+                    {% for error in form.name.errors %}
+                        <span class="form__error">{{ error|escape }}</span>
+                    {% endfor %}
                 </div>
             </div>
             <div class="form__group">
@@ -70,11 +73,11 @@
                         {% endfor %}
                     </div>
                     <span class="form__ingredient-link" id="addIng">Добавить ингредиент</span>
-                    {% for error in form.errors %}
-                    <span class="form__error">
-                        {{ error }}
-                    </span>
-                    {% endfor %}
+                    {% if form.non_field_errors %}
+                        <span class="form__error">
+                            {{ form.non_field_errors }}
+                        </span>
+                    {% endif %}
                 </div>
             </div>
             <div class="form__group">
@@ -84,7 +87,9 @@
                     <input type="text" id="id_time" name="time" class="form__input"
                     value="{{recipe.time}}">
                     <label for="id_time" class="form__label">минут</label>
-                    <span class="form__error"></span>
+                    {% if form.time.errors %}
+                        <span class="form__error">{{ form.time.errors }}</span>
+                    {% endif %}
                 </div>
             </div>
             <div class="form__group">
@@ -93,7 +98,10 @@
                 <div class="form__field-group">
                     <textarea name="description" id="id_description" rows="8"
                         class="form__textarea">{{recipe.description|striptags|safe}}</textarea>
-                    <span class="form__error">{{ form.description.errors|striptags }}</span>
+                    {% if form.description.errors %}
+                        <span class="form__error">
+                            {{ form.description.errors }}</span>
+                    {% endif %}
                 </div>
             </div>
             <div class="form__group">
@@ -102,7 +110,11 @@
                     {% csrf_token %}
                     <label for="id_file" class="form__file-button">Выбрать файл</label>
                     <input type="file" class="form__file" name="file" id="id_file">
-                    <span class="form__error"></span>
+                    {% if form.image.errors %}
+                        <span class="form__error">
+                            {{ form.image.errors|striptags }}
+                        </span>
+                    {% endif %}
                 </div>
             </div>
             {% if recipe.image != Null %}

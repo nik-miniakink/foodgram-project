@@ -52,6 +52,10 @@
 </main>
 {% endblock %}
 
+{% block paginator %}
+    {% include 'paginator.html'%}
+{% endblock %}
+
 {% block java-script %}
     <script src="{% static 'js/config/config.js' %}"></script>
     <script src="{% static 'js/components/MainCards.js' %}"></script>

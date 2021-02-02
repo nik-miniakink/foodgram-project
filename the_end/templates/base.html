@@ -9,11 +9,11 @@
           content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>{% block title %}Заголовок страницы{% endblock %}</title>
-    <link rel="stylesheet" href="{% static '/pages/index.css' %}">
 
+    {% load static %}
 
     {% block static %}
-
+        <link rel="stylesheet" href="{% static '/pages/index.css' %}">
     {% endblock %}
 
 {% csrf_token %}
@@ -28,8 +28,9 @@
             Контент
     {% endblock %}
 
-    {% include 'paginator.html'%}
-
+{% block paginator %}
+    паджинатор
+{% endblock %}
 
     {% include 'footer.html'%}
 

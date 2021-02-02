@@ -1,6 +1,5 @@
-FROM python:3.8.5
+FROM python:3.8
 WORKDIR /code
-RUN mkdir /code/staticfiles
 COPY requirements.txt /code
 RUN pip install -r /code/requirements.txt
 COPY . /code

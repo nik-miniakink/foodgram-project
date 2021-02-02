@@ -15,6 +15,10 @@
 
 {% endblock %}
 
+{% block paginator %}
+    {% include 'paginator.html'%}
+{% endblock %}
+
 {% block java-script %}
 {% csrf_token %}
     <script src="{% static 'js/components/MainCards.js' %}"></script>

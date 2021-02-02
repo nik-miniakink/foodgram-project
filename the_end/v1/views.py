@@ -3,6 +3,7 @@ import json
 import io
 
 from django.contrib.auth.decorators import login_required
+from django.core.exceptions import ObjectDoesNotExist
 from django.core.paginator import Paginator
 from django.shortcuts import get_object_or_404, redirect, render
 from django.http import JsonResponse, FileResponse
@@ -236,20 +237,6 @@ def delete_purchases(request, recipe_id):
     else:
         return JsonResponse({'success': True})
 
-#
-# @login_required
-# def get_ingredients(request):
-#     """
-#     вынимает данные из формы
-#     """
-#     ingredients = {}
-#     for key, ingredient_name in request.POST.items():
-#         if 'nameIngredient' in key:
-#             ing_id = key.split('_')[-1]
-#             ingredients[ingredient_name] = int(ing_id)
-#     return ingredients
-
-
 
 @login_required
 def get_ingredients_js(request):
@@ -296,7 +283,14 @@ def user_recipe_new(request):
         ingredients = get_ingredients(request)
         if not ingredients:
             form.add_error(None, 'Добавьте ингредиенты')
-        elif form.is_valid():
+
+        for ing_name, quantity in ingredients.items():
+            try:
+                ingredient = Ingredient.objects.get(name=ing_name)
+            except ObjectDoesNotExist:
+                form.add_error(None, 'Не все ингредиенты присутсвуют в базе')
+
+        if form.is_valid():
             recipe = form.save(commit=False)
             recipe.author = user
             recipe.save()
@@ -306,23 +300,16 @@ def user_recipe_new(request):
                 tag = Tag.objects.get(id=tag_id)
                 recipe.tag.add(tag)
 
-            # for ing_name, quantity in ingredients.items():
-            #     ingredient = Ingredient.objects.get(
-            #         name=ing_name)
-            #     new_ingredient = IngredientIncomposition.objects.get_or_create(
-            #         ingredient=ingredient,
-            #         quantity=quantity)[0]
-            #     recipe.ingredient_in.add(new_ingredient)
-            # form.save_m2m()
             for ing_name, quantity in ingredients.items():
-                ingredient = get_object_or_404(Ingredient, name=ing_name)
+                ingredient = Ingredient.objects.get(name=ing_name)
                 IngredientIncomposition.objects.create(
                     ingredient=ingredient,
                     quantity=quantity)
                 new_ingredient=IngredientIncomposition.objects.get(ingredient=ingredient,
                     quantity=quantity)
                 recipe.ingredient_in.add(new_ingredient)
-            # form.save_m2m()
+
+
             return redirect('index')
     else:
         form = RecipeForm()
@@ -351,6 +338,16 @@ def user_recipe_edit(request, recipe_id):
     )
     if request.method == "POST":
         ingredients = get_ingredients(request)
+
+        if not ingredients:
+            form.add_error(None, 'Добавьте ингредиенты')
+
+        for ing_name, quantity in ingredients.items():
+            try:
+                ingredient = Ingredient.objects.get(name=ing_name)
+            except ObjectDoesNotExist:
+                form.add_error(None, 'Не все ингредиенты присутсвуют в базе')
+
         if form.is_valid():
             form.save()
             recipe.ingredient_in.clear()
